@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Assignment: {{ assignment.title }}</h1>
+
+
+<div id="learning-content" class="row mt-4">
+    <!-- PDF/YouTube content -->
+    <div class="col-md-8">
+        {% if assignment.pdf_path %}
+        <embed src="{{ url_for('static', filename='uploads/pdfs/' + pdf_filename) }}" type="application/pdf"
+               width="100%" height="600px">
+        {% elif assignment.youtube_url %}
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe width="100%" height="600"
+                    src="https://www.youtube.com/embed/{{ assignment.youtube_url.split('v=')[1].split('&')[0] }}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+            </iframe>
+        </div>
+        {% else %}
+        <p>Unsupported assignment type.</p>
+        {% endif %}
+    </div>
+
+
+    <div class="col-md-4">
+        <div id="flash-message"></div>
+        <h4 class="mt-3">Notes</h4>
+
+        <form id="note-form" method="POST">
+            <div class="form-group">
+                <textarea class="form-control" id="note" name="note_content" rows="6">{{ note.text or assignment.summary or '' }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-success mt-3">Save Note</button>
+        </form>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('student_dashboard') }}" class="btn btn-primary">Back to Your Assignments</a>
+</div>
+
+<!-- Include Summernote CSS and JS -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/webgazer"></script> <!-- Include WebGazer -->
+
+<style>
+    /* Ensure the Summernote editable area has a consistent style */
+    .note-editable {
+        background-color: #ffffff !important; /* Set a fixed background color */
+        color: #212529 !important; /* Set a fixed text color */
+    }
+
+</style>
+
+<script>
+
+    // Ensure everything is ready before starting WebGazer
+    window.onload = function () {
+        // Enable WebGazer and set up gaze tracking
+        webgazer.setGazeListener((data, elapsedTime) => {
+            if (data) {
+                const gazeX = data.x;
+                const gazeY = data.y;
+
+                // Get the video element
+                const videoDiv = document.getElementById('learning-content');
+                const rect = videoDiv.getBoundingClientRect(); // Get the element's bounding box
+
+                // Check if the gaze is outside the div
+                const isOutside = (
+                        gazeX < rect.left ||  // Left side
+                        gazeX > rect.right || // Right side
+                        gazeY < rect.top ||   // Top side
+                        gazeY > rect.bottom   // Bottom side
+                );
+
+                const payload = {
+                    assignment_id: "{{ assignment.id }}",
+                    x: gazeX,
+                    y: gazeY,
+                    outside: isOutside,
+                    timestamp: new Date().toISOString(),  // Include the current timestamp
+                };
+
+                // Send data to backend
+                fetch('/save_focus_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                })
+                .then(response => response.json())
+                .then(data => console.log('Data saved:', data))
+                .catch(error => console.error('Error:', error));
+
+                if (isOutside) {
+                    console.log("You're looking outside the learning content!",JSON.stringify(payload));
+                } else {
+                    console.log("Gaze is inside the learning content.", JSON.stringify(payload));
+                }
+            }
+        }).begin();
+
+        // Disable video feedback
+        webgazer.showVideo(false).showFaceOverlay(false).showFaceFeedbackBox(false);
+
+        // Optionally enable or disable the eye tracking dot
+        webgazer.showPredictionPoints(true);
+
+        console.log("WebGazer initialized.");
+
+        // Stop WebGazer on unload
+        window.onbeforeunload = function () {
+            webgazer.end();
+        };
+    };
+
+
+    $(document).ready(function () {
+
+        // Initialize Summernote
+        $('#note').summernote({
+            placeholder: 'Write your notes here...',
+            tabsize: 2,
+            height: 300,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'italic', 'clear', 'fontsize']],
+                ['color', ['color', 'backColor']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link']]
+            ]
+        });
+
+
+        // AJAX form submission
+        $('#note-form').on('submit', function (e) {
+            e.preventDefault();
+
+            // Get the HTML content from Summernote
+            var noteContent = $('#note').summernote('code');
+
+            $.ajax({
+                type: 'POST',
+                url: window.location.href,
+                data: {note_content: noteContent},
+                success: function (response) {
+                    if (response.success) {
+                        // Show success message
+                        var flashMessage = $('<div>')
+                                .addClass('alert alert-success')
+                                .text(response.message)
+                                .hide()
+                                .appendTo('#flash-message')
+                                .fadeIn()
+                                .delay(4000)
+                                .fadeOut();
+                    }
+                },
+                error: function () {
+                    // Show error message
+                    var errorMessage = $('<div>')
+                            .addClass('alert alert-danger')
+                            .text('Error saving note')
+                            .hide()
+                            .appendTo('#flash-message')
+                            .fadeIn()
+                            .delay(4000)
+                            .fadeOut();
+                }
+            });
+        });
+
+    });
+</script>
+{% endblock %}

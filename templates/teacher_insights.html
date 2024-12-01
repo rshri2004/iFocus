@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container text-center">
+    <h1 class="mt-4">Insights for {{ assignment.title }}</h1>
+    <p class="mb-4">Below are the heatmap and insights for this assignment.</p>
+
+    <!-- Display Heatmap -->
+    <div>
+        <img src="{{ url_for('static', filename='teacher_heatmaps/' + heatmap_file) }}" alt="Heatmap" class="img-fluid">
+    </div>
+
+    <!-- Display Insights -->
+    <div class="mt-4">
+        <h3>Insights</h3>
+        <!-- Insights container -->
+        <div id="insights-content" style="white-space: pre-wrap;">{{ insights|safe }}</div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="mt-4">
+        <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+</div>
+
+<!-- Include Showdown.js -->
+<script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const insightsElement = document.getElementById('insights-content');
+        const insightsText = insightsElement.textContent.trim(); // Trim raw text
+
+        // Detect if content might be Markdown (basic heuristic)
+        const isMarkdown = /[*_#>-]/.test(insightsText) && insightsText.includes('\n');
+
+        if (isMarkdown) {
+            // Convert Markdown to HTML using Showdown
+            const converter = new showdown.Converter();
+            const htmlContent = converter.makeHtml(insightsText);
+
+            // Update the insights element with rendered HTML
+            insightsElement.innerHTML = htmlContent;
+        } else {
+            // Handle plain text with proper line breaks
+            insightsElement.textContent = insightsText;
+        }
+    });
+</script>
+{% endblock %}

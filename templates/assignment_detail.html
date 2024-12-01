@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4 mb-4 text-center">{{ assignment.title }}</h1>
+    <h2 class="mb-3">Assigned Students:</h2>
+    {% if students %}
+        <ul class="list-group">
+            {% for student in students %}
+                <li class="list-group-item">{{ student.username }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No students enrolled in this assignment yet.</p>
+    {% endif %}
+     <!-- Navigates back to the 'list-assignments' tab -->
+   <a href="{{ url_for('teacher_dashboard', tab='list-assignments') }}"
+   class="btn btn-primary mt-3">Back to Dashboard</a>
+</div>
+{% endblock %}

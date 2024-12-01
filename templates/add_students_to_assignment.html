@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mt-4 mb-4">Add Students to {{ assignment.title }}</h1>
+
+<form method="POST">
+    <div class="form-group">
+        <label for="students">Select Students:</label>
+        <select multiple class="form-control" name="student_ids">
+            {% for student in available_students %}
+                <option value="{{ student.id }}">{{ student.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mt-3">
+        <button type="submit" class="btn btn-success">Add Students</button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+    </div>
+</form>
+
+
+{% endblock %}

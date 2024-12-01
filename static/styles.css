@@ -1,0 +1,107 @@
+/* Theme Switcher Styles */
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    margin-left: 15px; /* Spacing from the logout link */
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 30px; /* Rounded switch */
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%; /* Circular knob */
+}
+
+/* Checked state for dark mode */
+input:checked + .slider {
+    background-color: #343a40;
+}
+
+input:checked + .slider:before {
+    transform: translateX(30px); /* Move the knob to the right */
+}
+
+/* Add sun and moon icons inside the slider */
+.slider:after {
+    position: absolute;
+    content: "☀️";
+    font-size: 18px;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    transition: 0.4s;
+}
+
+input:checked + .slider:after {
+    content: "🌙"; /* Moon icon for dark mode */
+    left: 36px;
+    font-size: 18px;
+    transform: translateY(-52%);
+}
+
+/* Light Mode Styles */
+body.light-mode {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.light-mode .navbar {
+    background-color: #007bff; /* Light blue navbar */
+    color: white;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #212529;
+    color: #f8f9fa;
+}
+
+.dark-mode .navbar {
+    background-color: #343a40; /* Dark navbar */
+    color: #f8f9fa;
+}
+
+/* Dark mode styles for modal */
+body.dark-mode .modal-content {
+    background-color: #212529; /* Dark background */
+    color: #f8f9fa; /* Light text */
+}
+
+body.dark-mode .modal-header {
+    background-color: #343a40; /* Slightly lighter dark background */
+    color: #f8f9fa; /* Light text */
+}
+
+body.dark-mode .modal-footer {
+    background-color: #343a40; /* Matches the header */
+}
+
+body.dark-mode .btn-close {
+    filter: invert(1); /* Makes the close button visible */
+}

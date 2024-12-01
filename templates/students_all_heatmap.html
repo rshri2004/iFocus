@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4 text-center">All Heatmaps for {{ student_name }}</h1>
+    <p class="text-center mb-4">Below are the heatmaps for all assignments.</p>
+
+    <div class="row">
+        {% for heatmap in heatmaps %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ heatmap.assignment_title }}</h5>
+                </div>
+                <img src="{{ url_for('static', filename='heatmaps/' + heatmap.heatmap_file) }}" 
+                     alt="Heatmap for {{ heatmap.assignment_title }}" 
+                     class="card-img-bottom img-fluid">
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center">
+        <a href="{{ url_for('student_dashboard') }}" class="btn btn-primary mt-4">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

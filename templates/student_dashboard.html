@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Welcome {{ current_user.username }}!</h1>
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="#your-assignments" data-bs-toggle="tab">Your Assignments</a>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-4">
+        <!-- Your Assignments Tab -->
+        <div class="tab-pane fade show active" id="your-assignments">
+            <h2>Your Assignments</h2>
+            <table class="table table-bordered">
+                <thead class="bg-primary">
+                <tr>
+                    <th class="text-white">Assignment Title</th>
+                    <th class="text-white">Insights</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for assignment in assignments %}
+                    <tr class="table-primary">
+                        <td>
+                            <a href="{{ url_for('student_assignment_details', assignment_id=assignment.id) }}">{{ assignment.title }}</a>
+                        </td>
+                        <td>
+                            {% if assignment.insights_available %}
+                                <a href="{{ url_for('student_insights', assignment_id=assignment.id) }}" class="btn btn-primary">
+                                    View Insights
+                                </a>
+                            {% else %}
+                                <span class="text-muted">Not Available</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

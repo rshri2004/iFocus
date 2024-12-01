@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>iFocus</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Navbar with Dark/Light Mode Toggle -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">iFocus</a>
+            <div class="navbar-nav ms-auto">
+                {% if current_user.is_authenticated %}
+                    <a class="nav-link" href="{{ url_for('logout') }}">Sign out</a>
+                {% endif %}
+                <!-- Help Nav Item -->
+                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a>
+                <!-- Dark/Light Mode Toggle -->
+                <div class="nav-item">
+                    <label class="theme-switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Need Help?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role == 'Student' %}
+                        <p>Welcome <strong>{{current_user.username }}</strong> ! As a Student :</p>
+                            <li> You can view your assignments </li>
+                            <li> Take notes while doing your assignment </li>
+                            <li> View insights of your focus data while doing the assignment </li>
+                            <li> Review AI generated recommendations </li>
+                            <li> <strong style="color: red;">Disclaimer: </strong>App requires camera access for focus insights </li>
+                            <li> Contact support at
+                                <a href="mailto:support@ifocus.com">support@ifocus.com</a> </li>
+                        {% else %}
+                        <p>Welcome <strong>{{current_user.username }}</strong> ! As a Teacher :</p>
+                            <li> You can view your assignments</li>
+                            <li> Create new assignments </li>
+                            <li> Assign assignments to students </li>
+                            <li> View insights about assignments </li>
+                            <li> Review AI generated recommendations</li>
+                            <li> Contact support at
+                                <a href="mailto:support@ifocus.com">support@ifocus.com</a></li>
+                        {% endif %}
+                    {% else %}
+                        <p>Welcome to iFocus! </p>
+                            <li>Please <a href="{{ url_for('login') }}">log in</a> to access personalized features </li>
+                            <li>Contact support at <a href="mailto:support@ifocus.com">support@ifocus.com</a>.</li>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set the time duration (in milliseconds) for the message to stay visible
+        setTimeout(function() {
+            var alertElements = document.querySelectorAll('.alert');
+            alertElements.forEach(function(alert) {
+                alert.classList.remove('show');  // Hide the alert
+                alert.classList.add('fade');     // Ensure it fades away
+            });
+        }, 2000);  // 2000 ms = 2 seconds
+
+        // Fancy Dark/Light Mode Toggle Logic
+        document.addEventListener('DOMContentLoaded', function () {
+            const themeToggleCheckbox = document.getElementById('theme-toggle');
+            const body = document.body;
+
+            // Load the saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light-mode';
+            body.classList.add(savedTheme);
+            themeToggleCheckbox.checked = savedTheme === 'dark-mode';
+
+
+            // Toggle theme on checkbox change
+            themeToggleCheckbox.addEventListener('change', function () {
+                const newTheme = themeToggleCheckbox.checked ? 'dark-mode' : 'light-mode';
+
+                body.classList.remove('light-mode', 'dark-mode');
+                body.classList.add(newTheme);
+
+                // Save the new theme preference
+                localStorage.setItem('theme', newTheme);
+            });
+
+            // Help Nav Item Click Logic
+            const helpNav = document.getElementById('help-nav');
+            const helpAlert = document.getElementById('help-alert');
+
+            helpNav.addEventListener('click', function (event) {
+                event.preventDefault();
+                helpAlert.classList.remove('d-none'); // Show the help alert
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4 text-center">Heatmap for Assignment: {{ assignment_title }}</h1>
+    <p class="text-center mb-4">This heatmap represents gaze data across all enrolled students.</p>
+
+    <div class="text-center">
+        <img src="{{ url_for('static', filename='teacher_heatmaps/' + heatmap_file) }}" 
+             alt="Heatmap for {{ assignment_title }}" 
+             class="img-fluid">
+    </div>
+
+    <div class="text-center">
+        <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-primary mt-4">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
